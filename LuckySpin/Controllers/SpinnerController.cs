@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using LuckySpin.Models;
 using LuckySpin.ViewModels;
+//using Microsoft.EntityFrameworkCore; ???
 
 namespace LuckySpin.Controllers
 {
@@ -9,16 +10,17 @@ namespace LuckySpin.Controllers
     {
         //TODO: remove reference to the Singleton Repository
         //      and inject a reference (dbcRepo) to the LuckySpinContext 
-        private Repository repository;
-        private LuckySpinContext dbcRepo;
+        private Repository repository; //************ DELETE ?
+        private LuckySpinContext dbcRepo; //***********
         Random random = new Random();
 
         /***
          * Controller Constructor
          */
-        public SpinnerController(Repository r) // LuckSpinContext lsc
+        public SpinnerController(Repository r) // LuckSpinContext dbcRepo2 ********
         {
-            repository = r; //dbcRepo = lsc
+            repository = r; // ************
+            //dbcRepo = dbcRepo2 
         }
 
         /***
@@ -45,38 +47,39 @@ namespace LuckySpin.Controllers
             };
             //TODO: Update persistent data using dbcRepo.Players.Add() and SaveChanges()
             repository.CurrentPlayer = player;
+            //dbcRepo.Player.Add(player); *********
+            //dbcRepo.SaveChanges(); ********
 
             //TODO: Pass the player Id to SpinIt
-            return RedirectToAction("SpinIt");
+            return RedirectToAction("SpinIt"); //return RedirectToAction("SpinIt", new { id = player.Id } ); ********
         }
 
         /***
          * Play through one Spin
          **/  
          [HttpGet]      
-         public IActionResult SpinIt() //TODO: receive the player Id
+         public IActionResult SpinIt() //TODO: receive the player Id  (player.Id) ?? ***************** (int id)
         {
             //TODO: Use the dbcRepo.Player.Find() to get the player object
+            //dbcRepo.Player.Find(([id]) *******************
 
-            // QUESTION 1: Why use the repository player information to initialize the SpinItViewModel?
-            //            (HINT: See what happens if you don't initialize it.)
             //TODO: Intialize the spinItVM with the player object from the database
             SpinItViewModel spinItVM = new SpinItViewModel() {
-                FirstName = repository.CurrentPlayer.FirstName,
+                FirstName = repository.CurrentPlayer.FirstName,  //Player = dbcRepo.Player ?????? ***********
                 Luck = repository.CurrentPlayer.Luck,
                 Balance = repository.CurrentPlayer.Balance
             };
 
-            // QUESTION 2: What else does ChargeSpin() do besides check if there is enough $$ to spin?
+
             if (!spinItVM.ChargeSpin())
             {
                 return RedirectToAction("LuckList");
             }
-            // QUESTION 3: Locate the if-else logic to determine a winning spin?
-            //             Why do you think it is done there? 
+
+
             if (spinItVM.Winner) { spinItVM.CollectWinnings(); }
 
-            // QUESTION 4: Why is it necessary to update the player's balance from the spinItVM after a spin?
+
             // TODO: Update the player Balance using the Player from the database
             repository.CurrentPlayer.Balance = spinItVM.Balance;
 
@@ -87,6 +90,8 @@ namespace LuckySpin.Controllers
             };
             //TODO: Update persistent data using dbcRepo.Spins.Add() and SaveChanges()
             repository.AddSpin(spin);
+            //dbcRepo.Spins.Add(spin); *********
+            //dbcRepo.SaveChanges(); **********
 
             return View("SpinIt", spinItVM);
         }
@@ -98,7 +103,7 @@ namespace LuckySpin.Controllers
          public IActionResult LuckList()
         {
             //TODO: Pass the View the Spins collection from the dbcRepo
-            return View(repository.PlayerSpins);
+            return View(repository.PlayerSpins); //dbcRepo.Spins **********
         }
 
     }
