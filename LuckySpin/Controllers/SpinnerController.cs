@@ -10,14 +10,15 @@ namespace LuckySpin.Controllers
         //TODO: remove reference to the Singleton Repository
         //      and inject a reference (dbcRepo) to the LuckySpinContext 
         private Repository repository;
+        private LuckySpinContext dbcRepo;
         Random random = new Random();
 
         /***
          * Controller Constructor
          */
-        public SpinnerController(Repository r)
+        public SpinnerController(Repository r) // LuckSpinContext lsc
         {
-            repository = r;
+            repository = r; //dbcRepo = lsc
         }
 
         /***

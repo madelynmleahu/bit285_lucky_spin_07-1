@@ -8,7 +8,11 @@ namespace LuckySpin.Models
 {
     public class LuckySpinContext  : DbContext
     {
-        public DbSet<Player> players { get; set; }
-        public DbSet<Spin> spins { get; set; }
+        public LuckySpinContext(DbContextOptions<LuckySpinContext> options) : base(options) 
+        { 
+            Database.EnsureCreated(); 
+        }
+        public DbSet<Player> Players { get; set; }
+        public DbSet<Spin> Spins { get; set; }
     }
 }
