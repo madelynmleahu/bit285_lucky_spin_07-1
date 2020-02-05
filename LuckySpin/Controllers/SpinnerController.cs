@@ -9,7 +9,7 @@ namespace LuckySpin.Controllers
     public class SpinnerController : Controller
     {
         //TODO: remove reference to the Singleton Repository
-        //      and inject a reference (dbcRepo) to the LuckySpinContext 
+        // and inject a reference (dbcRepo) to the LuckySpinContext 
         private LuckySpinContext dbcRepo; // DONE
         Random random = new Random();
 
@@ -36,20 +36,19 @@ namespace LuckySpin.Controllers
         {
             if (!ModelState.IsValid) { return View(); }
 
-            //Create a new Player object //DONE
+            //Create a new Player object // DONE
             Player player = new Player
             {
                 FirstName = info.FirstName,
                 Luck = info.Luck,
                 Balance = info.StartingBalance
             };
-            //TODO: Update persistent data using dbcRepo.Players.Add() and SaveChanges()
 
-            dbcRepo.Players.Add(player); //DONE
-            dbcRepo.SaveChanges(); //DONE
+            //TODO: Update persistent data using dbcRepo.Players.Add() and SaveChanges()
+            dbcRepo.Players.Add(player); // DONE
+            dbcRepo.SaveChanges(); // DONE
 
             //TODO: Pass the player Id to SpinIt
-            //return RedirectToAction("SpinIt");  DELETE
             return RedirectToAction("SpinIt", new { id = player.Id }); //DONE
         }
 
@@ -60,7 +59,7 @@ namespace LuckySpin.Controllers
          public IActionResult SpinIt(long Id) //TODO: receive the player Id  (player.Id) ?? ***************** (int id) //DONE
         {
             //TODO: Use the dbcRepo.Player.Find() to get the player object
-            Player player = dbcRepo.Players.Find(Id); //******************* //DONE ????????????????????? COME BACK HERE FOR CHECKING
+            Player player = dbcRepo.Players.Find(Id); // DONE
 
             //TODO: Intialize the spinItVM with the player object from the database
             SpinItViewModel spinItVM = new SpinItViewModel() {
@@ -77,8 +76,7 @@ namespace LuckySpin.Controllers
             if (spinItVM.Winner) { spinItVM.CollectWinnings(); }
 
             // TODO: Update the player Balance using the Player from the database
-            //repository.CurrentPlayer.Balance = spinItVM.Balance;
-            player.Balance = spinItVM.Balance; //CANNOT FIGURE OUT HOW TO DO THIS, WONT COMPILE
+            player.Balance = spinItVM.Balance; // DONE
 
             //Store the Spin in the Repository
             Spin spin = new Spin()
@@ -86,7 +84,6 @@ namespace LuckySpin.Controllers
                 IsWinning = spinItVM.Winner
             };
             //TODO: Update persistent data using dbcRepo.Spins.Add() and SaveChanges()
-            //repository.AddSpin(spin); DELETE
             dbcRepo.Spins.Add(spin); //DONE
             dbcRepo.SaveChanges(); //DONE
 
@@ -100,7 +97,6 @@ namespace LuckySpin.Controllers
          public IActionResult LuckList()
         {
             //TODO: Pass the View the Spins collection from the dbcRepo
-            //return View(repository.PlayerSpins); DELETE
             return View(dbcRepo.Spins); //DONE
         }
 
