@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using LuckySpin.Models;
 using LuckySpin.ViewModels;
-//using Microsoft.EntityFrameworkCore; ???
+using Microsoft.EntityFrameworkCore;
 
 namespace LuckySpin.Controllers
 {
@@ -10,17 +10,15 @@ namespace LuckySpin.Controllers
     {
         //TODO: remove reference to the Singleton Repository
         //      and inject a reference (dbcRepo) to the LuckySpinContext 
-        private Repository repository; //************ DELETE ?
-        private LuckySpinContext dbcRepo; //***********
+        private LuckySpinContext dbcRepo; // DONE
         Random random = new Random();
 
         /***
          * Controller Constructor
          */
-        public SpinnerController(Repository r) // LuckSpinContext dbcRepo2 ********
+        public SpinnerController(LuckySpinContext dbcRepoo) //  DONE
         {
-            repository = r; // ************
-            //dbcRepo = dbcRepo2 
+            dbcRepo = dbcRepoo; 
         }
 
         /***
@@ -38,7 +36,7 @@ namespace LuckySpin.Controllers
         {
             if (!ModelState.IsValid) { return View(); }
 
-            //Create a new Player object
+            //Create a new Player object //DONE
             Player player = new Player
             {
                 FirstName = info.FirstName,
@@ -46,42 +44,41 @@ namespace LuckySpin.Controllers
                 Balance = info.StartingBalance
             };
             //TODO: Update persistent data using dbcRepo.Players.Add() and SaveChanges()
-            repository.CurrentPlayer = player;
-            //dbcRepo.Player.Add(player); *********
-            //dbcRepo.SaveChanges(); ********
+
+            dbcRepo.Players.Add(player); //DONE
+            dbcRepo.SaveChanges(); //DONE
 
             //TODO: Pass the player Id to SpinIt
-            return RedirectToAction("SpinIt"); //return RedirectToAction("SpinIt", new { id = player.Id } ); ********
+            //return RedirectToAction("SpinIt");  DELETE
+            return RedirectToAction("SpinIt", new { id = player.Id }); //DONE
         }
 
         /***
          * Play through one Spin
          **/  
          [HttpGet]      
-         public IActionResult SpinIt() //TODO: receive the player Id  (player.Id) ?? ***************** (int id)
+         public IActionResult SpinIt(long Id) //TODO: receive the player Id  (player.Id) ?? ***************** (int id) //DONE
         {
             //TODO: Use the dbcRepo.Player.Find() to get the player object
-            //dbcRepo.Player.Find(([id]) *******************
+            Player player = dbcRepo.Players.Find(Id); //******************* //DONE ????????????????????? COME BACK HERE FOR CHECKING
 
             //TODO: Intialize the spinItVM with the player object from the database
             SpinItViewModel spinItVM = new SpinItViewModel() {
-                FirstName = repository.CurrentPlayer.FirstName,  //Player = dbcRepo.Player ?????? ***********
-                Luck = repository.CurrentPlayer.Luck,
-                Balance = repository.CurrentPlayer.Balance
+                FirstName = player.FirstName,  //DONE
+                Luck = player.Luck,
+                Balance = player.Balance
             };
-
 
             if (!spinItVM.ChargeSpin())
             {
                 return RedirectToAction("LuckList");
             }
 
-
             if (spinItVM.Winner) { spinItVM.CollectWinnings(); }
 
-
             // TODO: Update the player Balance using the Player from the database
-            repository.CurrentPlayer.Balance = spinItVM.Balance;
+            //repository.CurrentPlayer.Balance = spinItVM.Balance;
+            player.Balance = spinItVM.Balance; //CANNOT FIGURE OUT HOW TO DO THIS, WONT COMPILE
 
             //Store the Spin in the Repository
             Spin spin = new Spin()
@@ -89,9 +86,9 @@ namespace LuckySpin.Controllers
                 IsWinning = spinItVM.Winner
             };
             //TODO: Update persistent data using dbcRepo.Spins.Add() and SaveChanges()
-            repository.AddSpin(spin);
-            //dbcRepo.Spins.Add(spin); *********
-            //dbcRepo.SaveChanges(); **********
+            //repository.AddSpin(spin); DELETE
+            dbcRepo.Spins.Add(spin); //DONE
+            dbcRepo.SaveChanges(); //DONE
 
             return View("SpinIt", spinItVM);
         }
@@ -103,7 +100,8 @@ namespace LuckySpin.Controllers
          public IActionResult LuckList()
         {
             //TODO: Pass the View the Spins collection from the dbcRepo
-            return View(repository.PlayerSpins); //dbcRepo.Spins **********
+            //return View(repository.PlayerSpins); DELETE
+            return View(dbcRepo.Spins); //DONE
         }
 
     }
